@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Intelligence Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        }
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa);
+            background-size: 400% 400%;
+            animation: gradient-x 15s ease infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 bg-opacity-90">
+    <div class="container mx-auto max-w-6xl">
+        <div class="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
+            <div class="p-8 bg-gradient-to-r from-primary-600 to-primary-800">
+                <h1 class="text-4xl font-extrabold text-center text-white mb-4 tracking-tight">
+                    IP Intelligence Pro
+                </h1>
+                <p class="text-center text-primary-100 mb-6">
+                    Discover comprehensive insights about any IP address
+                </p>
+            </div>
+
+            <div class="p-8">
+                <div class="mb-6 flex shadow-lg">
+                    <input 
+                        type="text" 
+                        id="ipInput" 
+                        placeholder="Enter IP Address (Optional)" 
+                        class="flex-grow p-4 border-2 border-primary-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition duration-300"
+                    >
+                    <button 
+                        id="searchBtn" 
+                        class="bg-primary-600 text-white px-6 py-4 rounded-r-xl hover:bg-primary-700 transition duration-300 flex items-center space-x-2 group"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <span>Search</span>
+                    </button>
+                </div>
+
+                <div id="loading" class="text-center hidden">
+                    <div class="animate-pulse-slow inline-flex space-x-2 justify-center items-center">
+                        <div class="h-4 w-4 bg-primary-500 rounded-full"></div>
+                        <div class="h-4 w-4 bg-primary-500 rounded-full"></div>
+                        <div class="h-4 w-4 bg-primary-500 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div id="error" class="text-red-400 text-center font-semibold hidden"></div>
+
+                <div id="ipInfo" class="hidden space-y-8">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform transition hover:scale-105">
+                            <h3 class="text-xl font-bold text-primary-600 mb-4 border-b pb-2 border-primary-200">
+                                IP Basics
+                            </h3>
+                            <div class="space-y-3 text-white">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">IP Address</span>
+                                    <span id="ip" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Location</span>
+                                    <span id="location" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Timezone</span>
+                                    <span id="timezone" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Local Time</span>
+                                    <span id="localTime" class="font-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform transition hover:scale-105">
+                            <h3 class="text-xl font-bold text-primary-600 mb-4 border-b pb-2 border-primary-200">
+                                Geolocation
+                            </h3>
+                            <div class="space-y-3 text-white">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Coordinates</span>
+                                    <span class="font-semibold">
+                                        <span id="latitude"></span>, 
+                                        <span id="longitude"></span>
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Continent</span>
+                                    <span id="continent" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Postal Code</span>
+                                    <span id="zipcode" class="font-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform transition hover:scale-105">
+                            <h3 class="text-xl font-bold text-primary-600 mb-4 border-b pb-2 border-primary-200">
+                                Network Details
+                            </h3>
+                            <div class="space-y-3 text-white">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Company</span>
+                                    <span id="companyName" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">ASN</span>
+                                    <span id="asn" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Network Range</span>
+                                    <span id="networkRange" class="font-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform transition hover:scale-105">
+                            <h3 class="text-xl font-bold text-primary-600 mb-4 border-b pb-2 border-primary-200">
+                                IP Flags
+                            </h3>
+                            <div class="space-y-3 text-white">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Bogon</span>
+                                    <span id="isBogon" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Mobile</span>
+                                    <span id="isMobile" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Crawler</span>
+                                    <span id="isCrawler" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Datacenter</span>
+                                    <span id="isDatacenter" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Tor</span>
+                                    <span id="isTor" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Proxy</span>
+                                    <span id="isProxy" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">VPN</span>
+                                    <span id="isVpn" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-primary-200">Abuser</span>
+                                    <span id="isAbuser" class="font-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform transition hover:scale-105">
+                            <h3 class="text-xl font-bold text-primary-600 mb-4 border-b pb-2 border-primary-200">
+                                Abuse Contact
+                            </h3>
+                            <div class="space-y-3 text-white">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Name</span>
+                                    <span id="abuseName" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Address</span>
+                                    <span id="abuseAddress" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Email</span>
+                                    <span id="abuseEmail" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-primary-200">Phone</span>
+                                    <span id="abusePhone" class="font-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+  <script>
+    class IPIntelligence {
+        constructor() {
+            this.elements = {
+                input: document.getElementById('ipInput'),
+                searchBtn: document.getElementById('searchBtn'),
+                loading: document.getElementById('loading'),
+                error: document.getElementById('error'),
+                ipInfo: document.getElementById('ipInfo')
+            };
+
+            this.bindEvents();
+            this.fetchIPInfo();
+        }
+
+        bindEvents() {
+            this.elements.searchBtn.addEventListener('click', () => {
+                const ip = this.elements.input.value.trim();
+                this.fetchIPInfo(ip);
+            });
+
+            this.elements.input.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    const ip = this.elements.input.value.trim();
+                    this.fetchIPInfo(ip);
+                }
+            });
+        }
+
+        async fetchIPInfo(ip = '') {
+            this.elements.error.textContent = '';
+            this.elements.error.classList.add('hidden');
+            this.elements.ipInfo.classList.add('hidden');
+            this.elements.loading.classList.remove('hidden');
+
+            try {
+                const url = ip 
+                    ? `https://api.ipapi.is/?q=${encodeURIComponent(ip)}` 
+                    : 'https://api.ipapi.is/';
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                this.updateIPInfo(data);
+
+                this.elements.loading.classList.add('hidden');
+                this.elements.ipInfo.classList.remove('hidden');
+
+            } catch (error) {
+                this.elements.loading.classList.add('hidden');
+                this.elements.error.textContent = error.message;
+                this.elements.error.classList.remove('hidden');
+            }
+        }
+
+        updateIPInfo(data) {
+            // IP Basics
+            const basicMapping = {
+                'ip': data.ip,
+                'location': `${data.location.city}, ${data.location.state}, ${data.location.country}`,
+                'timezone': data.location.timezone,
+                'localTime': new Date(data.location.local_time).toLocaleString(),
+                'latitude': data.location.latitude.toFixed(4),
+                'longitude': data.location.longitude.toFixed(4),
+                'continent': data.location.continent,
+                'zipcode': data.location.zip,
+                'companyName': data.company.name,
+                'asn': `AS${data.asn?.asn} (${data.asn?.descr})`,
+                'networkRange': data.company.network
+            };
+
+            Object.entries(basicMapping).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value || 'N/A';
+                }
+            });
+
+   // IP Flags
+const flagMapping = {
+    'isBogon': data.is_bogon,
+    'isMobile': data.is_mobile,
+    'isCrawler': data.is_crawler,
+    'isDatacenter': data.is_datacenter,
+    'isTor': data.is_tor,
+    'isProxy': data.is_proxy,
+    'isVpn': data.is_vpn,
+    'isAbuser': data.is_abuser
+};
+
+Object.entries(flagMapping).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) {
+        if (id === 'isVpn' && value) {
+            // If it's a VPN, include the VPN name and service
+            const vpnService = data.vpn?.service || 'Unknown Service';
+            element.innerHTML = `
+                <span class="bg-red-500/20 text-red-600 px-2 py-1 rounded-md text-xs">
+                    Yes (Service: ${vpnService})
+                </span>`;
+        } else {
+            // General case for other flags
+            element.innerHTML = value 
+                ? `<span class="bg-red-500/20 text-red-600 px-2 py-1 rounded-md text-xs">Yes</span>` 
+                : `<span class="bg-green-500/20 text-green-600 px-2 py-1 rounded-md text-xs">No</span>`;
+        }
+    }
+});
+
+
+            // Abuse Contact
+            const abuseMapping = {
+                'abuseName': data.abuse?.name,
+                'abuseAddress': data.abuse?.address,
+                'abuseEmail': data.abuse?.email,
+                'abusePhone': data.abuse?.phone
+            };
+
+            Object.entries(abuseMapping).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value || 'N/A';
+                }
+            });
+        }
+    }
+
+    // Initialize when DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        new IPIntelligence();
+    });
+    </script>
+</body>
+</html>
